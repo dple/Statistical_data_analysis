@@ -24,15 +24,16 @@ plt.show()
 
 '''
 Show basic statistics of variables. Using package Statistics to show basic statistical information of variables
-1. Mean: mean of data
-2. Median: middle value of numeric data
-3. Variance: sample variance of data
-4: Standard Deviation: square root of variance
+1. Mean
+2: Standard Deviation
+3. Median
+4. Variance
+5. IQR
 '''
-print('Basic statistics of X:\n Mean = {},\n Median = {},\n Variance = {},\n Standard Deviation = {}.\n'.
-      format(stats.mean(X), stats.median(X), stats.variance(X), stats.stdev(X)))
-print('Basic statistics of Y:\n Mean = {},\n Median = {},\n Variance = {},\n Standard Deviation = {}.\n'.
-      format(stats.mean(Y), stats.median(Y), stats.variance(Y), stats.stdev(Y)))
+print('Basic statistics of X:\n Mean = {},\n Standard Deviation = {},\n Median = {},\n Variance = {}, \n IQR = {}.\n'.
+      format(stats.mean(X), stats.stdev(X), stats.median(X), stats.variance(X), stats.iqr(X)))
+print('Basic statistics of Y:\n Mean = {},\n Standard Deviation = {},\n Median = {},\n Variance = {}, \n IQR = {}.\n'.
+      format(stats.mean(Y), stats.stdev(Y), stats.median(Y), stats.variance(Y), stats.iqr(Y)))
 
 '''
 Show the correlation of the two variable. There are three types of correlation measures
