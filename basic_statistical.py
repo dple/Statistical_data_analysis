@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import statistics as stats
-import scipy.stats
+from scipy.stats import iqr
 
 # X, a random Gaussian distribution
 X = np.random.normal(0, 100, 1000)
@@ -31,9 +31,9 @@ Show basic statistics of variables. Using package Statistics to show basic stati
 5. IQR
 '''
 print('Basic statistics of X:\n Mean = {},\n Standard Deviation = {},\n Median = {},\n Variance = {}, \n IQR = {}.\n'.
-      format(stats.mean(X), stats.stdev(X), stats.median(X), stats.variance(X), stats.iqr(X)))
+      format(stats.mean(X), stats.stdev(X), stats.median(X), stats.variance(X), iqr(X)))
 print('Basic statistics of Y:\n Mean = {},\n Standard Deviation = {},\n Median = {},\n Variance = {}, \n IQR = {}.\n'.
-      format(stats.mean(Y), stats.stdev(Y), stats.median(Y), stats.variance(Y), stats.iqr(Y)))
+      format(stats.mean(Y), stats.stdev(Y), stats.median(Y), stats.variance(Y), iqr(Y)))
 
 '''
 Show the correlation of the two variable. There are three types of correlation measures
