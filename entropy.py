@@ -7,8 +7,7 @@ Phong D. Le  -  le.duc.phong@gmail.com
 import numpy as np
 from numpy.random import seed, randn, normal
 import math
-from scipy.stats import iqr
-from statistics import stdev
+from scipy.stats import iqr, tstd
 
 EPS = np.finfo(float).eps
 
@@ -31,7 +30,7 @@ def determine_nbins1D(X, rule):
     if rule == 'Freedman‐Diaconis':
         return math.ceil(maxmin_range/(2.0 * iqr(X) * n3))
     if rule == 'Scott':
-        return math.ceil(maxmin_range / (3.5 * stdev(X) * n3))
+        return math.ceil(maxmin_range / (3.5 * tstd(X) * n3))
     if rule == 'Sturges':
         return math.ceil(1 + math.log(n, 2))
     return 0
@@ -109,6 +108,9 @@ print('No bins for X1 and X2 = {}'.format(nbins))
 
 entropy = single_entropy(X1, 'unknown')
 print('Entropy of X1 = {}'.format(entropy))
+
+entropy = single_entropy(X2, 'normal')
+print('Entropy of X2 = {}'.format(entropy))
 
 joint_entropy = joint_entropy(X1, X2, 'unknown', 'normal')
 print('Joint Entropy of X1 and X2 = {}'.format(joint_entropy))
