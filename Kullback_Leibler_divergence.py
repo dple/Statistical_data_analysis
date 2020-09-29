@@ -12,6 +12,9 @@ from numpy.random import seed, randn, normal
 EPS = np.finfo(float).eps
 
 def KL_divergence(X1, X2, nbins):
+    """
+    Calculate Kullback-Leibler divergence of X1 and X2
+    """
     amax = max(np.max(X1), np.max(X2))
     amin = min(np.min(X1), np.min(X2))
     P, _ = np.histogram(X1, bins=nbins, range=[amin, amax])
