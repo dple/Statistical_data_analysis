@@ -10,6 +10,7 @@ Phong D. Le  -  le.duc.phong@gmail.com
 import numpy as np
 from numpy.random import seed, randn, normal
 from scipy.stats import iqr, tstd
+from numpy import ma
 
 EPS = np.finfo(float).eps
 
@@ -23,7 +24,9 @@ def determine_nbins1D(X, rule = 'Sturges'):
                             nbins = ceil(max(X) - min(X) / 3.5 * STD * N^{-1/3})
                     3) Sturges' Rule
                             nbins = ceil(1 + log2(n))
-
+            
+            default: Sturges's rule
+    
     :return: the optimal number of bins used to calculate entropy
     '''
     maxmin_range = max(X) - min(X)
@@ -70,33 +73,36 @@ def determine_nbins2D(X1, X2, rule1 = 'Sturges', rule2 = 'Sturges'):
     return np.ceil((nbins1 + nbins2)/2).astype('int')
 
 
-def joint_entropy(X1, X2, dist1, dist2):
+def joint_entropy(X1, X2, dist1=None, dist2=None):
     '''
     Calculate the joint entropy of two variables X1, and X2
     H(X, Y) = -sum(p(xy)[i] * log2(p(xy)[i]))
     https://en.wikipedia.org/wiki/Joint_entropy
     '''
-    rule1 = 'Sturges'
-    if dist1 == 'normal':
-        rule1 = 'Scott'
-    elif dist1 == 'unknown':
-        rule1 = 'Freedman‐Diaconis'
+    if dist1 == None:
+        nbins1 = determine_nbins1D(X1)
+    else:
+        rule1 = 'Sturges'
+        if dist1 == 'normal':
+            rule1 = 'Scott'
+        elif dist1 == 'unknown':
+            rule1 = 'Freedman‐Diaconis'
+        nbins1 = determine_nbins1D(X1, rule1)
 
-    rule2 = 'Sturges'
-    if dist2 == 'normal':
-        rule2 = 'Scott'
-    elif dist2 == 'unknown':
-        rule2 = 'Freedman‐Diaconis'
-
-    nbins1 = determine_nbins1D(X1, rule1)
-    nbins2 = determine_nbins1D(X2, rule2)    
+    if dist2 == None:
+        nbins2 = determine_nbins1D(X2)
+    else:
+        rule2 = 'Sturges'
+        if dist2 == 'normal':
+            rule2 = 'Scott'
+        elif dist2 == 'unknown':
+            rule2 = 'Freedman‐Diaconis'
+        nbins2 = determine_nbins1D(X2, rule2)
+        
     pxy, _, _ = np.histogram2d(X1, X2, bins=[nbins1, nbins2])
     pxy = pxy / pxy.sum()
 
-    return -sum(pxy[i][j] * np.log2(pxy[i][j])
-                if pxy[i][j] > 0 else 0
-                for i in range(len(pxy))
-                for j in range(len(pxy[0])))
+    return -np.sum(pxy * ma.log2(pxy).filled(0))
 
 if __name__ == '__main__':
 
