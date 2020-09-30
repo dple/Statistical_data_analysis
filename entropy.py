@@ -1,5 +1,8 @@
 """
-Calculate entropy using different methods
+Calculate entropy by binning. The number of bins is determined by 
+different rules depending on the variable's distributions
+
+https://en.wikipedia.org/wiki/Entropy_(information_theory)
 
 Phong D. Le  -  le.duc.phong@gmail.com
 """
@@ -36,9 +39,10 @@ def determine_nbins1D(X, rule = 'Sturges'):
 
 
 def single_entropy(X, dist=None):
-    """
+    '''
     Calculate the entropy of a random variable X
-    """
+    H(X) = -sum(p[i] * log(p[i], 2))
+    '''
     rule = None
     if dist == 'normal':
         rule = 'Scott'
@@ -53,14 +57,13 @@ def single_entropy(X, dist=None):
     p, _ = np.histogram(X, nbins)
     p = p / p.sum()
 
-    HX = 0.0
-    for i in range(len(p)):
-        if p[i] > 0:   # p[i] += EPS     # Add a small value EPS if the probability of a bin equals to 0
-            HX += p[i] * np.log2(p[i])
-
-    return -HX
+    return -sum(p[i] * np.log2(p[i]) if p[i] > 0 else 0 for i in range(len(p)))
 
 def determine_nbins2D(X1, X2, rule1 = 'Sturges', rule2 = 'Sturges'):
+    '''
+    When working with more than one variables, the number of bins is 
+    average of numbers of bins determined for individual variables
+    '''
     nbins1 = determine_nbins1D(X1, rule1)
     nbins2 = determine_nbins1D(X2, rule2)
 
@@ -68,9 +71,11 @@ def determine_nbins2D(X1, X2, rule1 = 'Sturges', rule2 = 'Sturges'):
 
 
 def joint_entropy(X1, X2, dist1, dist2):
-    """
+    '''
     Calculate the joint entropy of two variables X1, and X2
-    """
+    H(X, Y) = -sum(p(xy)[i] * log2(p(xy)[i]))
+    https://en.wikipedia.org/wiki/Joint_entropy
+    '''
     rule1 = 'Sturges'
     if dist1 == 'normal':
         rule1 = 'Scott'
@@ -83,20 +88,15 @@ def joint_entropy(X1, X2, dist1, dist2):
     elif dist2 == 'unknown':
         rule2 = 'Freedman‐Diaconis'
 
-    nbins = determine_nbins2D(X1, X2, rule1, rule2)
-    jointProbs, _, _ = np.histogram2d(X1, X2, bins=nbins)
-    jointProbs = jointProbs / jointProbs.sum()
+    nbins1 = determine_nbins1D(X1, rule1)
+    nbins2 = determine_nbins1D(X2, rule2)    
+    pxy, _, _ = np.histogram2d(X1, X2, bins=[nbins1, nbins2])
+    pxy = pxy / pxy.sum()
 
-    HXY = 0
-    rows = len(jointProbs)
-    cols = len(jointProbs[0])
-
-    for i in range(rows):
-        for j in range(cols):
-            if jointProbs[i][j] > 0:    #        jointProbs[i][j] += EPS
-                HXY += jointProbs[i][j] * np.log2(jointProbs[i][j])
-
-    return -HXY
+    return -sum(pxy[i][j] * np.log2(pxy[i][j])
+                if pxy[i][j] > 0 else 0
+                for i in range(len(pxy))
+                for j in range(len(pxy[0])))
 
 if __name__ == '__main__':
 
