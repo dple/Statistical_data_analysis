@@ -1,5 +1,6 @@
 """
-Calculate entropy using different methods
+Calculate Kullback-Leibler divergence (KLD). KLD is also called relative entropy
+https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
 
 Phong D. Le  -  le.duc.phong@gmail.com
 """
@@ -36,6 +37,8 @@ if __name__ == '__main__':
     X1 = 20 * randn(1000) + 100
     X2 = 10 * normal(0, 20, 1000)
 
+    # Use Freedman‐Diaconis' rule if the distribution is unknown. 
+    # If the distribution is normal, using Scott's rule
     nbins = determine_nbins2D(X1, X2, 'Freedman‐Diaconis', 'Scott')
     print('No bins for X1 and X2 = {}'.format(nbins))
 
