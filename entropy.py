@@ -6,12 +6,11 @@ Phong D. Le  -  le.duc.phong@gmail.com
 
 import numpy as np
 from numpy.random import seed, randn, normal
-import math
 from scipy.stats import iqr, tstd
 
 EPS = np.finfo(float).eps
 
-def determine_nbins1D(X, rule):
+def determine_nbins1D(X, rule = 'Sturges'):
     '''
     There are three common methods to determine the number of bins to compute entropy of ONE variable X
     :param X: array-like of numbers
@@ -28,40 +27,44 @@ def determine_nbins1D(X, rule):
     n = len(X)
     n3= n ** (-1/3)
     if rule == 'Freedman‐Diaconis':
-        return math.ceil(maxmin_range/(2.0 * iqr(X) * n3))
+        return np.ceil(maxmin_range/(2.0 * iqr(X) * n3)).astype('int')
     if rule == 'Scott':
-        return math.ceil(maxmin_range / (3.5 * tstd(X) * n3))
+        return np.ceil(maxmin_range / (3.5 * tstd(X) * n3)).astype('int')
     if rule == 'Sturges':
-        return math.ceil(1 + math.log(n, 2))
+        return np.ceil(1 + np.log2(n)).astype('int')
     return 0
 
 
-def single_entropy(X, dist):
+def single_entropy(X, dist=None):
     """
     Calculate the entropy of a random variable X
     """
-    rule = 'Sturges'
+    rule = None
     if dist == 'normal':
         rule = 'Scott'
     elif dist == 'unknown':
         rule = 'Freedman‐Diaconis'
 
-    nbins = determine_nbins1D(X, rule)
+    if rule == None:
+        nbins = determine_nbins1D(X)
+    else:
+        nbins = determine_nbins1D(X, rule)
+
     p, _ = np.histogram(X, nbins)
     p = p / p.sum()
 
     HX = 0.0
     for i in range(len(p)):
         if p[i] > 0:   # p[i] += EPS     # Add a small value EPS if the probability of a bin equals to 0
-            HX += p[i] * math.log2(p[i])
+            HX += p[i] * np.log2(p[i])
 
     return -HX
 
-def determine_nbins2D(X1, X2, rule1, rule2):
+def determine_nbins2D(X1, X2, rule1 = 'Sturges', rule2 = 'Sturges'):
     nbins1 = determine_nbins1D(X1, rule1)
     nbins2 = determine_nbins1D(X2, rule2)
 
-    return math.ceil((nbins1 + nbins2)/2)
+    return np.ceil((nbins1 + nbins2)/2).astype('int')
 
 
 def joint_entropy(X1, X2, dist1, dist2):
@@ -91,26 +94,25 @@ def joint_entropy(X1, X2, dist1, dist2):
     for i in range(rows):
         for j in range(cols):
             if jointProbs[i][j] > 0:    #        jointProbs[i][j] += EPS
-                HXY += jointProbs[i][j] * math.log2(jointProbs[i][j])
+                HXY += jointProbs[i][j] * np.log2(jointProbs[i][j])
 
     return -HXY
 
-# seed random number generator
-seed(1)
-# prepare data
-X1 = 20 * randn(1000) + 100
-X2 = 10 * normal(0, 20, 1000)
-nbins = determine_nbins1D(X1, rule='Freedman‐Diaconis')
-print('No bins for X1 = {}'.format(nbins))
+if __name__ == '__main__':
 
-nbins = determine_nbins2D(X1, X2, 'Freedman‐Diaconis', 'Scott')
-print('No bins for X1 and X2 = {}'.format(nbins))
+    # seed random number generator
+    seed(1)
+    # prepare data
+    X1 = 20 * randn(1000) + 100
+    X2 = 10 * normal(0, 20, 1000) + 50
+    nbins = determine_nbins1D(X1, rule='Freedman‐Diaconis')
+    print('No bins for X1 = {}'.format(nbins))
 
-entropy = single_entropy(X1, 'unknown')
-print('Entropy of X1 = {}'.format(entropy))
+    nbins = determine_nbins2D(X1, X2, 'Freedman‐Diaconis', 'Scott')
+    print('No bins for X1 and X2 = {}'.format(nbins))
 
-entropy = single_entropy(X2, 'normal')
-print('Entropy of X2 = {}'.format(entropy))
+    print('Entropy of X1 = {}'.format(single_entropy(X1, 'unknown')))
+    print('Entropy of X2 = {}'.format(single_entropy(X2, 'normal')))
 
-joint_entropy = joint_entropy(X1, X2, 'unknown', 'normal')
-print('Joint Entropy of X1 and X2 = {}'.format(joint_entropy))
+    joint_entropy = joint_entropy(X1, X2, 'unknown', 'normal')
+    print('Joint Entropy of X1 and X2 = {}'.format(joint_entropy))
