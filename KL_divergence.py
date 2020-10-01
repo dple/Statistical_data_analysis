@@ -11,14 +11,16 @@ from numpy.random import seed, randn, normal
 
 EPS = np.finfo(float).eps
 
-def KL_divergence(X1, X2, nbins):
+def KL_divergence(X, Y, nbins):
     """
-    Calculate Kullback-Leibler divergence of X1 and X2
+    Calculate Kullback-Leibler divergence of X and Y
+
+    Formula: KLD(X, Y) = D_KL (Px || Py) = sum(px * log2 (px / py))
     """
-    amax = max(np.max(X1), np.max(X2))
-    amin = min(np.min(X1), np.min(X2))
-    p, _ = np.histogram(X1, bins=nbins, range=[amin, amax])
-    q, _ = np.histogram(X2, bins=nbins, range=[amin, amax])
+    amax = max(np.max(X), np.max(Y))
+    amin = min(np.min(X), np.min(Y))
+    p, _ = np.histogram(X, bins=nbins, range=[amin, amax])
+    q, _ = np.histogram(Y, bins=nbins, range=[amin, amax])
     p = p / p.sum()
     q = q / q.sum()
 
@@ -34,13 +36,14 @@ if __name__ == '__main__':
     # seed random number generator
     seed(1)
     # prepare data
-    X1 = 20 * randn(1000) + 100
-    X2 = 10 * normal(0, 20, 1000)
+    X = 20 * randn(1000) + 100
+    Y = 10 * normal(0, 20, 1000)
 
-    # Use Freedman‐Diaconis' rule if the distribution is unknown. 
+    # Use Freedman‐Diaconis' rule if the distribution is unknown.
     # If the distribution is normal, using Scott's rule
-    nbins = determine_nbins2D(X1, X2, 'Freedman‐Diaconis', 'Scott')
-    print('No bins for X1 and X2 = {}'.format(nbins))
+    nbins = determine_nbins2D(X, Y, 'Freedman‐Diaconis', 'Scott')
 
-    kld = KL_divergence(X1, X2, nbins)
-    print('Kullback-Leibler Divergence of X1 and X2 = {}'.format(kld))
+    print('Kullback-Leibler Divergence of X over Y = {}'.format(KL_divergence(X, Y, nbins)))
+
+    # KL divergence is not symmetric, that is KLD(X, Y) <> KLD (Y, X)
+    print('Kullback-Leibler Divergence of Y over X = {}'.format(KL_divergence(Y, X, nbins)))
