@@ -1,5 +1,5 @@
 """
-Show statistical information 
+Show statistical information
 
 Le, Phong D.  -  le.duc.phong@gmail.com
 Date: Sep 19, 2020
@@ -36,6 +36,40 @@ def corshow(X, Y):
     print('Kendall tau Correlation between X and Y is \n{}'.format(kendalltau(X, Y)[0]))
 
 
+def visualize2D(X):
+    '''
+    Show histogram of the variable X
+    '''
+
+    # Calculate the number of bins using Sturges' rule
+    # Formula:    bins = ceil(1 + log2(n))
+    bins = np.ceil(1 + np.log2(len(X))).astype('int')
+    plt.hist(X, bins=bins, density=True)
+
+def visualize3D(X, Y):
+    '''
+    Show 3D histogram of joint probabily of X and Y
+    '''
+    # Determine the number of bins using Sturges' rule
+    binX = np.ceil(1 + np.log2(len(X))).astype('int')
+    binY = np.ceil(1 + np.log2(len(Y))).astype('int')
+
+    # Create 2d histogram
+    Hist, _, _ = np.histogram2d(X, Y, bins=[binX, binY])
+
+    # Define 3d axes
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Create an X-Y mesh of the 2D data
+    x_data, y_data = np.meshgrid(np.arange(Hist.shape[1]), np.arange(Hist.shape[0]))
+
+    # Flatten out the arrays to pass to bar3d
+    x_data = x_data.flatten()
+    y_data = y_data.flatten()
+    z_data = Hist.flatten()
+    ax.bar3d(x_data, y_data, np.zeros(len(z_data)), 1, 1, z_data)
+
 
 if __name__ == '__main__':
     # X, a random Gaussian distribution
@@ -52,7 +86,11 @@ if __name__ == '__main__':
     # Show correlation information between X and Y
     corshow(X, Y)
 
-    # Plot histogram of the variable
-    plt.hist(X)
-    plt.hist(Y)
+    # Plot 2D histogram of the variable
+    visualize2D(X)
+    visualize2D(Y)
+    plt.show()
+
+    # Plot 3D histogram of the two variables
+    visualize3D(X, Y)
     plt.show()
