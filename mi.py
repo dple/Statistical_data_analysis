@@ -1,5 +1,6 @@
 """
 Calculate mutual information between two variables
+https://en.wikipedia.org/wiki/Mutual_information
 
 Phong D. Le  -  le.duc.phong@gmail.com
 """
@@ -10,8 +11,8 @@ from numpy.random import seed, randn, normal
 
 def mutual_information(X, Y, dist1=None, dist2 = None):
     """
-    Calculate the mutual information between X and Y.
-    Using single and joint entropies
+    Calculate the mutual information between X and Y. Using single and joint entropies:
+    https://en.wikipedia.org/wiki/Mutual_information#Relation_to_conditional_and_joint_entropy
 
     I(X, Y) = H(X) + H(Y) - H(X, Y)
     """
